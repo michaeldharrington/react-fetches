@@ -1,25 +1,56 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+const API = 'https://hn.algolia.com/api/v1/search?query='
+const DEFAULT_QUERY = 'redux'
+
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hits: [],
+      isLoading: false,
+      error: null
+    }
+  }
+
+  componentDidMount() {
+    this.setState({ isLoading: true })
+
+    fetch(API + DEFAULT_QUERY)
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Something went wrong ...')
+        }
+      })
+
+      .then(data => this.setState({ hits: data.hits, isLoading: false }))
+      .catch(error => this.setState({ error, isLoading: false }));
+  }
+
   render() {
+  const { hits, isLoading, error } = this.state
+
+    if (error) {
+      return <p>{error.message}</p>
+    }
+
+    if (isLoading) {
+      return <p>Loading ...</p>
+    }
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <ul>
+          {hits.map(hit =>
+            <li key={hit.objectID}>
+              <a href={hit.url}>{hit.title}</a>
+            </li>  
+          )}
+        </ul>
       </div>
     );
   }
