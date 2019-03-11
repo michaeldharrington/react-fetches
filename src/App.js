@@ -16,18 +16,22 @@ class App extends Component {
     }
   }
 
-  getStories() {
+  async componentDidMount() {
     this.setState({ isLoading: true })
 
-    axios.get(API + DEFAULT_QUERY)
-      .then(result => this.setState({
+    try {
+      const result = await axios.get(API + DEFAULT_QUERY)
+
+      this.setState({
         hits: result.data.hits,
         isLoading: false
-      }))
-      .catch(error => this.setState({
-        error, 
+      });
+    } catch (error) {
+      this.setState({
+        error,
         isLoading: false
-      }))
+      })
+    }
   }
 
   render() {
