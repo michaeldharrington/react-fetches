@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios'
 import './App.css';
 
 const API = 'https://hn.algolia.com/api/v1/search?query='
@@ -15,20 +16,18 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
+  getStories() {
     this.setState({ isLoading: true })
 
-    fetch(API + DEFAULT_QUERY)
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Something went wrong ...')
-        }
-      })
-
-      .then(data => this.setState({ hits: data.hits, isLoading: false }))
-      .catch(error => this.setState({ error, isLoading: false }));
+    axios.get(API + DEFAULT_QUERY)
+      .then(result => this.setState({
+        hits: result.data.hits,
+        isLoading: false
+      }))
+      .catch(error => this.setState({
+        error, 
+        isLoading: false
+      }))
   }
 
   render() {
